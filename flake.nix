@@ -20,8 +20,22 @@
           inherit system overlays;
         };
         lib = pkgs.lib;
+        toolchain = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
       in
       {
+        devShells.default = pkgs.mkShell {
+          nativeBuildInputs = with pkgs; [
+            pkg-config
+            clang
+          ];
+          buildInputs = [
+            pkgs.rust-analyzer-unwrapped
+            toolchain
+          ];
+          # Environment variables
+          RUST_SRC_PATH = "${toolchain}/lib/rustlib/src/rust/library";
+        };
+
         packages.default = pkgs.rustPlatform.buildRustPackage {
           pname = "test_static";
           inherit ((lib.importTOML ./Cargo.toml).package) version;
@@ -33,7 +47,10 @@
             allowBuiltinFetchGit = true;
           };
 
-          nativeBuildInputs = [ ];
+          nativeBuildInputs = with pkgs; [
+            pkg-config
+            clang
+          ];
 
           doCheck = false;
           RUSTFLAGS = "-C target-feature=+crt-static";
