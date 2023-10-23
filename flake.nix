@@ -37,7 +37,7 @@
         };
 
         packages.default = pkgs.rustPlatform.buildRustPackage {
-          pname = "test_static";
+          pname = "rust-nix-static";
           inherit ((lib.importTOML ./Cargo.toml).package) version;
 
           src = lib.cleanSource ./.;
